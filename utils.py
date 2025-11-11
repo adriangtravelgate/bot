@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 # Carga del canal de discord (cambiar en el .env si se prueba en otro canal)
 load_dotenv()
 CHANNEL_ID = int(os.getenv('CHANNEL_ID'))
+GUILD_ID = int(os.getenv('GUILD_ID'))
+ROLE_ID = int(os.getenv('ROLE_ID'))
 
 # Archivo donde se guardaran los condecorados
 DATA_FILE = 'hilos_info.json'
@@ -27,7 +29,7 @@ async def enviar_mensajes_y_crear_hilos(bot):
     canal = bot.get_channel(CHANNEL_ID)
 
     # ID del Rol al que mencionará el bot para las condecoraciones (Service Integration)
-    roleId = 1419979252945649674
+    roleId = ROLE_ID
 
     # Mensajes que enviará el bot al ejecutarse
     mensajes = [
@@ -131,10 +133,6 @@ async def revisar_reacciones_y_mencionar(bot):
         # Obtener todos los mensajes del hilo
         mensajes = [msg async for msg in hilo.history(limit=None)]
 
-        if not mensajes:
-            print(f"📭 El hilo {hilo.name} está vacío.")
-            continue
-
         # Buscar el mensaje con más reacciones
         Votos = '👍'
 
@@ -148,20 +146,19 @@ async def revisar_reacciones_y_mencionar(bot):
         menciones = mensaje_mas_reaccionado.mentions
 
         if not menciones:
-            print(f"El mensaje más votado en '{hilo.name}' no tiene menciones.")
+            resumen[hilo.name] = ["Ningún ganador"]
             continue
 
         # Guardar ganadores en resumen
         resumen[hilo.name] = [u.mention for u in menciones]
 
     # Creamos el mensaje para los condecorados
-    if resumen:
-        resumen_texto = "Los medallistas: \n\n"
-        for categoria, ganadores in resumen.items():
-            resumen_texto += f"- **{categoria}**: {', '.join(ganadores)}\n"
 
+    resumen_texto = "Los medallistas: \n\n"
+    for categoria, ganadores in resumen.items():
+        resumen_texto += f"- **{categoria}**: {', '.join(ganadores)}\n"
         # Enviamos el mensaje de condecorados
-        await original_canal.send(resumen_texto)
+    await original_canal.send(resumen_texto)
 
     # Limpiar archivo para el conteo de las siguientes condecoraciones
     with open(DATA_FILE, 'w', encoding='utf-8') as f:

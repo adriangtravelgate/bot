@@ -1,28 +1,42 @@
 import discord
+from discord.ext import commands
 import os
 from dotenv import load_dotenv
 from scheduler import start_scheduler, programar_envio_mensajes
 
-# Carga de entorno y token del bot
+# Cargar variables de entorno
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-# Permisos del bot para manejar el canal de discord 
+# Configurar intents
 intents = discord.Intents.default()
+intents.message_content = True
+intents.reactions = True
+intents.members = True
 
-intents.message_content = True   # Enviar mensajes y crear hilos
-intents.reactions = True         # Conteo de reacciones
-intents.members = True           # Mencionar miembros condecorados
+# Crear el bot con soporte de comandos
+bot = commands.Bot(command_prefix="!", intents=intents)
 
-
-bot = discord.Client(intents=intents)
-
+# ✅ Evento al iniciar
 @bot.event
 # Comando para ejecutar el bot, activar entorno antes (venv\Scripts\activate) y luego lanzar el bot (python bot.py)
 async def on_ready():
-    print(f'✅ Bot conectado como {bot.user}')
-    start_scheduler()
-    programar_envio_mensajes(bot)
+    try:
+        synced = await bot.tree.sync()
+        print(f"{len(synced)} comandos sincronizados.")
+    except Exception as e:
+        print(f"Error al sincronizar comandos: {e}")
 
+# Slash command: /condecorar
+@bot.tree.command(name="condecorar", description="Inicia las condecoraciones.")
+async def condecorar(interaction: discord.Interaction):
+    try:
+        start_scheduler()
+        programar_envio_mensajes(bot)
+        await interaction.response.send_message("Iniciando condecoraciones.", ephemeral=True)
+    except Exception as e:
+        await interaction.response.send_message(f"Error al iniciar las condecoraciones: {e}", ephemeral=True)
+        print(f"Error al iniciar condecoraciones: {e}")
 
+# Ejecutar el bot
 bot.run(TOKEN)

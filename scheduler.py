@@ -39,13 +39,15 @@ def programar_envio_mensajes(bot):
         # Si se ha enviado bien revisar las reacciones
         if resultado:
             programar_revision(bot)
+            
+    next_run_time = datetime.now() + timedelta(days=14)
 
     scheduler.add_job(
         job_wrapper,
         'interval',
         days=14,
-        next_run_time=datetime.now(),
+        next_run_time=datetime.now(),  # Para pruebas inmediatas, borrar al subir el bot
         id='enviar_mensajes'
     )
     # Mismo que el otro, borrar al subir el bot
-    print("📅 Job de envío de mensajes programado cada 14 días")
+    print(f"📅 Job de envío de mensajes programado para las {next_run_time.strftime('%Y-%m-%d %H:%M:%S')}")
