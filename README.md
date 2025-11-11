@@ -1,12 +1,24 @@
-Para instalar el bot hay que crear un entorno y activar los scripts
+# 🤖 Instalación del Bot
+
+Este proyecto incluye un bot que requiere la configuración de un entorno virtual para funcionar correctamente.  
+Sigue los pasos a continuación para realizar la instalación en tu equipo. 🚀
+
+---
+
+## 🧩 1. Crear un entorno virtual
+
+Primero, crea un entorno virtual para aislar las dependencias del proyecto:
 
 python -m venv venv
 
-source venv/bin/activate     (Linux/macOS)
+## ⚙️ 2. Activar el entorno virtual
 
-venv\Scripts\activate        (Windows)
+Linux/macOS
+    source venv/bin/activate     
 
+Windows
+    venv\Scripts\activate
 
-Instalar librerias
+## 📦 3. Instalar dependencias
 
 pip install -r requirements.txt
