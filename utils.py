@@ -3,11 +3,12 @@ import discord
 import json
 from dotenv import load_dotenv
 
-# Carga del canal de discord (cambiar en el .env si se prueba en otro canal)
+# Carga del canal de discord, rol y usuario fantasma (cambiar en el .env si se prueba en otro canal)
 load_dotenv()
 CHANNEL_ID = int(os.getenv('CHANNEL_ID'))
 GUILD_ID = int(os.getenv('GUILD_ID'))
 ROLE_ID = int(os.getenv('ROLE_ID'))
+FANTASMA_ID = int(os.getenv('FANTASMA_ID'))
 
 # Archivo donde se guardaran los condecorados
 DATA_FILE = 'hilos_info.json'
@@ -96,6 +97,7 @@ async def enviar_mensajes_y_crear_hilos(bot):
 
 
 async def revisar_reacciones_y_mencionar(bot):
+    # Print para revisar en local el tiempo que tarda, se puede borrar luego
     print("🔍 Revisando reacciones por hilo y mencionando ganadores...")
 
     # Volvemos a cargar los datos del archivo generado antes
@@ -107,7 +109,7 @@ async def revisar_reacciones_y_mencionar(bot):
 
     resumen = {}  # Diccionario para el resumen final
 
-    # Iteramos en cada hilo guardado en el archivo anterior
+    # Iteramos en cada hilo que se haya guardado en el archivo anterior
     for hilo_id_str, info in data.items():
         
         hilo_id = int(hilo_id_str)
@@ -121,19 +123,18 @@ async def revisar_reacciones_y_mencionar(bot):
         try:
             # Variable original_canal coge el canal en el que se crea el hilo
             original_canal = hilo.parent
-            original_mensaje = await original_canal.fetch_message(info["message_id"])
             # Control de errores por si no se encuentra el canal
         except discord.NotFound:
-            print(f"⚠️ Mensaje original del hilo {hilo_id} no encontrado.")
+            print(f"Mensaje original del hilo {hilo_id} no encontrado.")
             continue
         except Exception as e:
-            print(f"❌ Error inesperado al acceder al mensaje original del hilo {hilo_id}: {e}")
+            print(f"Error inesperado al acceder al mensaje original del hilo {hilo_id}: {e}")
             continue
 
         # Obtener todos los mensajes del hilo
         mensajes = [msg async for msg in hilo.history(limit=None)]
 
-        # Buscar el mensaje con más reacciones
+        # Buscar el mensaje con más reacciones, contando la reaccion 👍 como votos
         Votos = '👍'
 
         mensaje_mas_reaccionado = max(
@@ -144,8 +145,15 @@ async def revisar_reacciones_y_mencionar(bot):
 
         # Obtener menciones del mensaje más reaccionado
         menciones = mensaje_mas_reaccionado.mentions
-
+        fantasmaId = FANTASMA_ID
+        
+        if hilo.name == "Fantasma del equipo 👻":
+            # Mencionar siempre al mismo usuario para la condecoración de fantasma, buscando su ID de usuario
+            resumen[hilo.name] = [u.mention for u in bot.get_all_members() if u.id == fantasmaId]
+            continue
+        
         if not menciones:
+            # Si no hay ninguna mención establecer que no hay ganadores
             resumen[hilo.name] = ["Ningún ganador"]
             continue
 
@@ -156,7 +164,8 @@ async def revisar_reacciones_y_mencionar(bot):
 
     resumen_texto = "Los medallistas: \n\n"
     for categoria, ganadores in resumen.items():
-        resumen_texto += f"- **{categoria}**: {', '.join(ganadores)}\n"
+        # Aquí pasamos los ganadores a string ya que para establecer el fantasma del equipo por id lo hacemos con un int y peta
+           resumen_texto += f"- **{categoria}**: {', '.join(str(g) for g in ganadores)}\n"
         # Enviamos el mensaje de condecorados
     await original_canal.send(resumen_texto)
 

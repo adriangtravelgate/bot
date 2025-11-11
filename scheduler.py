@@ -8,10 +8,10 @@ def start_scheduler():
     # Iniciar scheduler si no esta ya iniciado
     if not scheduler.running:
         scheduler.start()
-        print("✅ Scheduler iniciado")
 
 def programar_revision(bot):
-    # Comprobación de si scheduler está iniciado para evitar que haga un bucle, hasta siguientes condecoraciones no se vuelve a añadir el job
+    # Comprobación de si el job está iniciado en scheduler para evitar que haga un bucle, 
+    # si ya existe el job lo elimina para crear uno nuevo
     if scheduler.get_job('revisar_reacciones'):
         scheduler.remove_job('revisar_reacciones')
 
@@ -25,11 +25,13 @@ def programar_revision(bot):
         id='revisar_reacciones',
         args=[bot]
     )
-    # Para comprobar en consola cuando se revisa/envia el mensaje con ganadores, se puede quitar al subir el bot mas tarde ya que realmente no hace nada
+    # Para comprobar en consola cuando se revisa/envia el mensaje con ganadores, 
+    # se puede quitar al subir el bot mas tarde ya que realmente no hace nada
     print(f"⏳ Job de revisión programado para {run_time.strftime('%Y-%m-%d %H:%M:%S')}")
 
 def programar_envio_mensajes(bot):
-    # Misma comprobación que con la función de antes
+    # Comprobación de si el job está iniciado en scheduler para evitar que haga un bucle, 
+    # si ya existe el job lo elimina para crear uno nuevo
     if scheduler.get_job('enviar_mensajes'):
         scheduler.remove_job('enviar_mensajes')
 
@@ -46,8 +48,9 @@ def programar_envio_mensajes(bot):
         job_wrapper,
         'interval',
         days=14,
-        next_run_time=datetime.now(),  # Para pruebas inmediatas, borrar al subir el bot
+        # Ejecutar el comando cada dos semanas, siempre y que no se apague el bot
+        next_run_time=datetime.now(),
         id='enviar_mensajes'
     )
-    # Mismo que el otro, borrar al subir el bot
+    # Comprobar en consola cuando se enviará el mensaje, se puede quitar al subir el bot mas tarde
     print(f"📅 Job de envío de mensajes programado para las {next_run_time.strftime('%Y-%m-%d %H:%M:%S')}")

@@ -15,11 +15,11 @@ intents.reactions = True
 intents.members = True
 
 # Crear el bot con soporte de comandos
-bot = commands.Bot(command_prefix="!", intents=intents)
+bot = commands.Bot(command_prefix="/", intents=intents)
 
 # ✅ Evento al iniciar
 @bot.event
-# Comando para ejecutar el bot, activar entorno antes (venv\Scripts\activate) y luego lanzar el bot (python bot.py)
+# Sincronizar los comandos al iniciar el bot
 async def on_ready():
     try:
         synced = await bot.tree.sync()
@@ -27,16 +27,19 @@ async def on_ready():
     except Exception as e:
         print(f"Error al sincronizar comandos: {e}")
 
-# Slash command: /condecorar
+
+# Slash command: /condecorar, activar entorno antes (venv\Scripts\activate) y luego lanzar el bot (python bot.py)
 @bot.tree.command(name="condecorar", description="Inicia las condecoraciones.")
 async def condecorar(interaction: discord.Interaction):
     try:
         start_scheduler()
         programar_envio_mensajes(bot)
+        # Mensaje al ejecutar el comando, para que solo se vea unos segundos el usuario que lo ha ejecutado
         await interaction.response.send_message("Iniciando condecoraciones.", ephemeral=True)
     except Exception as e:
+        # Mensaje de error en caso de fallo, no debería saltar y si sale saldrá el 
+        # predeterminado de discord porque el bot no esté funcional, se añade en caso de alguna otra excepción
         await interaction.response.send_message(f"Error al iniciar las condecoraciones: {e}", ephemeral=True)
-        print(f"Error al iniciar condecoraciones: {e}")
 
 # Ejecutar el bot
 bot.run(TOKEN)
