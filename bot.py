@@ -17,18 +17,8 @@ intents.members = True
 # Crear el bot con soporte de comandos
 bot = commands.Bot(command_prefix="/", intents=intents)
 
-# ✅ Evento al iniciar
-@bot.event
-# Sincronizar los comandos al iniciar el bot
-async def on_ready():
-    try:
-        synced = await bot.tree.sync()
-        print(f"{len(synced)} comandos sincronizados.")
-    except Exception as e:
-        print(f"Error al sincronizar comandos: {e}")
-
-
-# Slash command: /condecorar, activar entorno antes (venv\Scripts\activate) y luego lanzar el bot (python bot.py)
+# Slash command: /condecorar 
+# activar entorno antes (venv\Scripts\activate) y luego lanzar el bot (python bot.py)
 @bot.tree.command(name="condecorar", description="Inicia las condecoraciones.")
 async def condecorar(interaction: discord.Interaction):
     try:
