@@ -25,9 +25,6 @@ def programar_revision(bot):
         id='revisar_reacciones',
         args=[bot]
     )
-    # Para comprobar en consola cuando se revisa/envia el mensaje con ganadores, 
-    # se puede quitar al subir el bot mas tarde ya que realmente no hace nada
-    print(f"⏳ Job de revisión programado para {run_time.strftime('%Y-%m-%d %H:%M:%S')}")
 
 def programar_envio_mensajes(bot):
     # Comprobación de si el job está iniciado en scheduler para evitar que haga un bucle, 
@@ -52,5 +49,3 @@ def programar_envio_mensajes(bot):
         next_run_time=datetime.now(),
         id='enviar_mensajes'
     )
-    # Comprobar en consola cuando se enviará el mensaje, se puede quitar al subir el bot mas tarde
-    print(f"📅 Job de envío de mensajes programado para las {next_run_time.strftime('%Y-%m-%d %H:%M:%S')}")

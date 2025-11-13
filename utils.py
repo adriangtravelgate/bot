@@ -97,14 +97,10 @@ async def enviar_mensajes_y_crear_hilos(bot):
 
 
 async def revisar_reacciones_y_mencionar(bot):
-    # Print para revisar en local el tiempo que tarda, se puede borrar luego
-    print("🔍 Revisando reacciones por hilo y mencionando ganadores...")
-
     # Volvemos a cargar los datos del archivo generado antes
     data = cargar_datos()
     # Si esta vacío interrumpimos la operación
     if not data:
-        print("No hay datos de hilos.")
         return False
 
     resumen = {}  # Diccionario para el resumen final
@@ -115,9 +111,8 @@ async def revisar_reacciones_y_mencionar(bot):
         hilo_id = int(hilo_id_str)
         hilo = bot.get_channel(hilo_id)
 
-        # Si no existe el hilo lanza error
+        # Si no existe el hilo continúa con el siguiente
         if not isinstance(hilo, discord.Thread):
-            print(f"⚠️ Hilo {hilo_id} no válido o no encontrado.")
             continue
 
         try:
@@ -125,10 +120,8 @@ async def revisar_reacciones_y_mencionar(bot):
             original_canal = hilo.parent
             # Control de errores por si no se encuentra el canal
         except discord.NotFound:
-            print(f"Mensaje original del hilo {hilo_id} no encontrado.")
             continue
         except Exception as e:
-            print(f"Error inesperado al acceder al mensaje original del hilo {hilo_id}: {e}")
             continue
 
         # Obtener todos los mensajes del hilo
